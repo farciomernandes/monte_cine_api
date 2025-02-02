@@ -55,6 +55,14 @@ export class SaveMovieDto {
   banner: string;
 
   @ApiProperty({
+    description: 'The slug of the movie',
+    example: 'inception_two',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'O campo slug é obrigatório' })
+  slug: string;
+
+  @ApiProperty({
     description: 'The director of the movie',
     example: 'Christopher Nolan',
   })
