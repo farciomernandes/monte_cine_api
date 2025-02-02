@@ -1,14 +1,9 @@
 import { BaseORMEntity } from '@infra/typeorm/shared/entities/base-orm.entity';
 import { Category } from '@modules/category/entities/category.entity';
-import {
-  Entity,
-  Column,
-  ManyToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToMany } from 'typeorm';
 
 @Entity('movie')
 export class Movie extends BaseORMEntity {
-
   @Column({ type: 'varchar' })
   title: string;
 
@@ -20,6 +15,12 @@ export class Movie extends BaseORMEntity {
 
   @Column({ type: 'varchar', nullable: true })
   link: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  banner: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  slug: string;
 
   @Column({ type: 'varchar', nullable: false })
   director: string;

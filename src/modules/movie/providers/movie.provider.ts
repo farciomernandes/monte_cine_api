@@ -6,6 +6,7 @@ import { IGetMovieUseCase } from '../usecases/get-movie/interfaces/get-movie.int
 import { IDeleteMovieUseCase } from '../usecases/delete-movie/interfaces/delete-movie.interface';
 import { MovieModelDto } from '../dtos/movie-model.dto';
 import { SaveMovieDto } from '../dtos/save-movie.dto';
+import { Multer } from 'multer';
 
 @Injectable()
 export class MovieProvider {
@@ -13,14 +14,19 @@ export class MovieProvider {
     private readonly saveMovieUseCase: ISaveMovieUseCase,
     private readonly getMovieUseCase: IGetMovieUseCase,
     private readonly deleteMovieUseCase: IDeleteMovieUseCase,
-
   ) {}
 
-  async saveOrUpdateMovie(payload: SaveMovieDto, id?: string): Promise<MovieModelDto> {
-    return this.saveMovieUseCase.execute(payload, id);
+  async saveOrUpdateMovie(
+    payload: Omit<SaveMovieDto, 'banner'>,
+    banner: Multer.File,
+    id?: string,
+  ): Promise<MovieModelDto> {
+    return this.saveMovieUseCase.execute(payload, banner, id);
   }
 
-  async findAll(params: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
+  async findAll(
+    params: SearchParamsDto,
+  ): Promise<PaginationDto<MovieModelDto>> {
     return this.getMovieUseCase.execute(params);
   }
 

@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsOptional, IsBoolean, IsArray, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  IsNumber,
+} from 'class-validator';
 import { CategoryModelDto } from '@modules/category/dtos/category-model.dto';
 import { BaseModelDto } from '@modules/@shared/dtos/base-model.dto';
 
@@ -36,6 +44,22 @@ export class MovieModelDto extends BaseModelDto {
   @IsOptional()
   @IsString()
   link: string;
+
+  @ApiProperty({
+    type: 'string',
+    description: 'Image file',
+  })
+  @IsString()
+  @IsOptional()
+  banner: string;
+
+  @ApiProperty({
+    description: 'The slug of the movie',
+    example: 'inception_two',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'O campo slug é obrigatório' })
+  slug: string;
 
   @ApiProperty({
     description: 'The director of the movie',
@@ -100,7 +124,8 @@ export class MovieModelDto extends BaseModelDto {
 
   @ApiProperty({
     description: 'A brief synopsis of the movie',
-    example: 'A thief who steals corporate secrets through the use of dream-sharing technology...',
+    example:
+      'A thief who steals corporate secrets through the use of dream-sharing technology...',
   })
   @IsString()
   @IsNotEmpty({ message: 'O campo sinopse é obrigatório' })
@@ -139,5 +164,4 @@ export class MovieModelDto extends BaseModelDto {
   @IsOptional()
   @IsArray()
   categories: CategoryModelDto[];
-
 }

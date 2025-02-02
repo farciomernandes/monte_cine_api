@@ -10,9 +10,12 @@ import {
   Delete,
   Put,
   Param,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -23,16 +26,19 @@ import { MovieProvider } from './providers/movie.provider';
 import { SaveMovieDto } from './dtos/save-movie.dto';
 import { MovieModelDto } from './dtos/movie-model.dto';
 import { PaginationDto } from 'src/shared/filter/pagination.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import multerConfig from '@infra/config/multerConfig';
+import { Multer } from 'multer';
 
 @ApiTags('Movie')
 @Controller('movies')
 @UseInterceptors(CacheInterceptor)
 export class MovieController {
-  constructor(
-    private readonly movieProvider: MovieProvider,
-  ) {}
+  constructor(private readonly movieProvider: MovieProvider) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('banner', multerConfig))
   @ApiOperation({
     summary: 'Criar uma filme',
   })
@@ -46,12 +52,24 @@ export class MovieController {
   })
   @HttpCode(HttpStatus.OK)
   async saveMovie(
-    @Body() payload: SaveMovieDto,
+    @Body() payload: Omit<SaveMovieDto, 'banner'>,
+    @UploadedFile() banner: Multer.File,
   ): Promise<MovieModelDto> {
-    return this.movieProvider.saveOrUpdateMovie(payload);
+    console.log(payload);
+    if (payload.categories && typeof payload.categories === 'string') {
+      try {
+        payload.categories = JSON.parse(payload.categories);
+      } catch (error) {
+        throw new BadRequestException('Invalid categories JSON format!');
+      }
+    }
+
+    return this.movieProvider.saveOrUpdateMovie(payload, banner);
   }
 
   @Put(':id')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('banner', multerConfig))
   @ApiOperation({
     summary: 'Atualizar uma filme',
   })
@@ -66,9 +84,19 @@ export class MovieController {
   @HttpCode(HttpStatus.OK)
   async updateMovie(
     @Param('id') id: string,
-    @Body() payload: SaveMovieDto,
+    @Body() payload: Omit<SaveMovieDto, 'banner'>,
+    @UploadedFile() banner: any,
   ): Promise<MovieModelDto> {
-    return this.movieProvider.saveOrUpdateMovie(payload, id);
+    console.log(payload);
+    if (payload.categories && typeof payload.categories === 'string') {
+      try {
+        payload.categories = JSON.parse(payload.categories);
+      } catch (error) {
+        throw new BadRequestException('Invalid categories JSON format!');
+      }
+    }
+
+    return this.movieProvider.saveOrUpdateMovie(payload, banner, id);
   }
 
   @Get()
@@ -95,9 +123,7 @@ export class MovieController {
     type: MovieModelDto,
   })
   @HttpCode(HttpStatus.OK)
-  async deleteMovie(
-    @Param('id') id: string,
-  ): Promise<MovieModelDto> {
+  async deleteMovie(@Param('id') id: string): Promise<MovieModelDto> {
     return this.movieProvider.delete(id);
   }
 }

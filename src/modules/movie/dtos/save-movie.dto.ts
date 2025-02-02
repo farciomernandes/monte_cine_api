@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsOptional, IsBoolean, IsArray, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  IsNumber,
+} from 'class-validator';
 import { CategoryModelDto } from '@modules/category/dtos/category-model.dto';
 import { Category } from '@modules/category/entities/category.entity';
 
@@ -36,6 +44,15 @@ export class SaveMovieDto {
   @IsOptional()
   @IsString()
   link: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Image file',
+  })
+  @IsString()
+  @IsOptional()
+  banner: string;
 
   @ApiProperty({
     description: 'The director of the movie',
@@ -100,7 +117,8 @@ export class SaveMovieDto {
 
   @ApiProperty({
     description: 'A brief synopsis of the movie',
-    example: 'A thief who steals corporate secrets through the use of dream-sharing technology...',
+    example:
+      'A thief who steals corporate secrets through the use of dream-sharing technology...',
   })
   @IsString()
   @IsNotEmpty({ message: 'O campo sinopse é obrigatório' })
