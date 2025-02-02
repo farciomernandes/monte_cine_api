@@ -9,6 +9,7 @@ import { Movie } from '@modules/movie/entities/movie.entity';
 import { In } from 'typeorm';
 import { S3Storage } from '@infra/aws/S3Storage';
 import { Multer } from 'multer';
+import { PinoLogger } from '@infra/logger/pino.logger';
 
 @Injectable()
 export class SaveMovieUseCase implements ISaveMovieUseCase {
@@ -16,6 +17,7 @@ export class SaveMovieUseCase implements ISaveMovieUseCase {
     private readonly movieRepository: MovieRepository,
     private readonly categoryRepository: CategoryRepository,
     private readonly s3Repository: S3Storage,
+    private readonly logger: PinoLogger,
   ) {}
 
   async execute(
@@ -23,12 +25,15 @@ export class SaveMovieUseCase implements ISaveMovieUseCase {
     banner: Multer.File,
     id?: string,
   ): Promise<MovieModelDto> {
+    this.logger.log(`Start save movie ${payload.title}`);
+
     let movie = await this.movieRepository.findOne({
       where: { title: payload.title },
       relations: ['categories'],
     });
 
     if (movie && !id) {
+      this.logger.error(`Movie with payload ${payload.title} with error`);
       throw new BadRequestException(
         `Movie with title ${payload.title} already exists!`,
       );
@@ -49,20 +54,34 @@ export class SaveMovieUseCase implements ISaveMovieUseCase {
       movie = new Movie();
     }
 
-    if (payload.categories && payload.categories.length > 0) {
-      const categories = await this.categoryRepository.findBy({
-        id: In(payload.categories.map((category) => category.id)),
-      });
-
-      if (categories.length !== payload.categories.length) {
-        throw new BadRequestException('One or more categories not found!');
+    if (payload.categories) {
+      const categoryIds: string[] = [];
+      if (Array.isArray(payload.categories)) {
+        const categories =
+          typeof payload.categories === 'string'
+            ? JSON.parse(payload.categories)
+            : payload.categories;
+        categories.forEach((category) => categoryIds.push(category.id));
+      } else {
+        const parsedCategories =
+          typeof payload.categories === 'string'
+            ? JSON.parse(payload.categories)
+            : payload.categories;
+        categoryIds.push(parsedCategories.id);
       }
 
+      const categories = await this.categoryRepository.findBy({
+        id: In(categoryIds),
+      });
+
       movie.categories = categories;
+      payload.categories = categories;
     }
+
     const image_url = await this.s3Repository.saveFile(banner);
 
     const movieData = { ...movie, ...payload, banner: image_url };
+    this.logger.log(`Saving movie ${payload.title}`);
 
     return this.movieRepository.save(movieData);
   }

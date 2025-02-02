@@ -1,4 +1,3 @@
-import { NewrelicInterceptor } from '@infra/newrelic/newrelic.interceptor';
 import {
   type INestApplication,
   ValidationPipe,

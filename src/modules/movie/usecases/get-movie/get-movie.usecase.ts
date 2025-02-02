@@ -10,9 +10,14 @@ import { MovieRepository } from '@infra/typeorm/repositories/movie.respository';
 export class GetMovieUseCase implements IGetMovieUseCase {
   constructor(private readonly movieRepository: MovieRepository) {}
 
-  async execute({ page, limit }: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
+  async execute({
+    page,
+    limit,
+  }: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
     if (page < 1 || limit < 1) {
-      throw new BadRequestException('Page and limit must be greater than zero.');
+      throw new BadRequestException(
+        'Page and limit must be greater than zero.',
+      );
     }
 
     const [movies, total] = await this.movieRepository.findAndCount({
@@ -23,12 +28,12 @@ export class GetMovieUseCase implements IGetMovieUseCase {
 
     const totalPages = Math.ceil(total / limit);
 
-    const data = movies.map(movie => {
+    const data = movies.map((movie) => {
       const movieDto = new MovieModelDto();
       movieDto.id = movie.id;
       movieDto.title = movie.title;
-      movieDto.year = movie.year;
-      movieDto.duration = movie.duration;
+      movieDto.year = Number(movie.year);
+      movieDto.duration = Number(movie.duration);
       movieDto.link = movie.link;
       movieDto.director = movie.director;
       movieDto.country = movie.country;
@@ -36,25 +41,34 @@ export class GetMovieUseCase implements IGetMovieUseCase {
       movieDto.writter = movie.writter;
       movieDto.productor = movie.productor;
       movieDto.editor = movie.editor;
-      movieDto.rating = movie.rating;
+      movieDto.rating = Number(movie.rating);
       movieDto.synopsis = movie.synopsis;
       movieDto.cast = movie.cast;
+      movieDto.cast = movie.cast;
+      movieDto.cast = movie.cast;
+
       movieDto.available_languages = movie.available_languages;
       movieDto.available_streaming = movie.available_streaming;
       movieDto.created_at = movie.created_at;
       movieDto.updated_at = movie.updated_at;
-      
-      movieDto.categories = movie.categories.map(category => ({
+
+      movieDto.categories = movie.categories.map((category) => ({
         id: category.id,
         name: category.name,
         image_link: category.image_link,
         created_at: category.created_at,
-        updated_at: category.updated_at
+        updated_at: category.updated_at,
       }));
 
       return movieDto;
     });
 
-    return { data, total, totalPages, currentPage: Number(page), limit: Number(limit) };
+    return {
+      data,
+      total,
+      totalPages,
+      currentPage: Number(page),
+      limit: Number(limit),
+    };
   }
 }

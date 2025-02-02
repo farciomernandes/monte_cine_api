@@ -55,10 +55,13 @@ export class MovieController {
     @Body() payload: Omit<SaveMovieDto, 'banner'>,
     @UploadedFile() banner: Multer.File,
   ): Promise<MovieModelDto> {
-    console.log(payload);
     if (payload.categories && typeof payload.categories === 'string') {
       try {
-        payload.categories = JSON.parse(payload.categories);
+        const cleanedCategories = (payload.categories as string)
+          .replace(/[\r\n]/g, '')
+          .replace(/}{/g, '},{');
+
+        payload.categories = JSON.parse(`[${cleanedCategories}]`);
       } catch (error) {
         throw new BadRequestException('Invalid categories JSON format!');
       }
@@ -87,15 +90,17 @@ export class MovieController {
     @Body() payload: Omit<SaveMovieDto, 'banner'>,
     @UploadedFile() banner: any,
   ): Promise<MovieModelDto> {
-    console.log(payload);
     if (payload.categories && typeof payload.categories === 'string') {
       try {
-        payload.categories = JSON.parse(payload.categories);
+        const cleanedCategories = (payload.categories as string)
+          .replace(/[\r\n]/g, '')
+          .replace(/}{/g, '},{');
+
+        payload.categories = JSON.parse(`[${cleanedCategories}]`);
       } catch (error) {
         throw new BadRequestException('Invalid categories JSON format!');
       }
     }
-
     return this.movieProvider.saveOrUpdateMovie(payload, banner, id);
   }
 

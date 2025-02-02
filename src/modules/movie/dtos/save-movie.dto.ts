@@ -159,8 +159,9 @@ export class SaveMovieDto {
 
   @ApiProperty({
     description: 'List of categories associated with the movie',
-    type: [CategoryModelDto],
+    type: CategoryModelDto,
     required: false,
+    isArray: true,
   })
   @IsOptional()
   @IsArray()

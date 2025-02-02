@@ -11,6 +11,7 @@ import { CategoryModule } from '@modules/category/category.module';
 import { CategoryRepository } from '@infra/typeorm/repositories/category.respository';
 import { MovieController } from './movie.controller';
 import { S3Storage } from '@infra/aws/S3Storage';
+import { PinoLogger } from '@infra/logger/pino.logger';
 
 @Module({
   imports: [CategoryModule],
@@ -18,20 +19,23 @@ import { S3Storage } from '@infra/aws/S3Storage';
     MovieRepository,
     CategoryRepository,
     S3Storage,
+    PinoLogger,
     {
       provide: ISaveMovieUseCase,
       useFactory: (
         movieRepository: MovieRepository,
         categoryRepository: CategoryRepository,
         s3Storage: S3Storage,
+        logger: PinoLogger,
       ) => {
         return new SaveMovieUseCase(
           movieRepository,
           categoryRepository,
           s3Storage,
+          logger,
         );
       },
-      inject: [MovieRepository, CategoryRepository, S3Storage],
+      inject: [MovieRepository, CategoryRepository, S3Storage, PinoLogger],
     },
     {
       provide: IGetMovieUseCase,
