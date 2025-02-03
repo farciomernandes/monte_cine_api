@@ -8,42 +8,37 @@ import { IGetCategoryUseCase } from './usecases/get-categories/interfaces/get-ca
 import { GetCategoryUseCase } from './usecases/get-categories/get-category.usecase';
 import { IDeleteCategoryUseCase } from './usecases/delete-category/interfaces/delete-category.interface';
 import { DeleteCategoryUseCase } from './usecases/delete-category/delete-category.usecase';
-
+import { S3Storage } from '@infra/aws/S3Storage';
+import { PinoLogger } from '@infra/logger/pino.logger';
 
 @Module({
   imports: [],
   providers: [
     CategoryRepository,
+    S3Storage,
+    PinoLogger,
     {
       provide: ISaveCategoryUseCase,
       useFactory: (
         categoryRepository: CategoryRepository,
+        s3Storage: S3Storage,
+        logger: PinoLogger,
       ) => {
-        return new SaveCategoryUseCase(
-          categoryRepository,
-        );
+        return new SaveCategoryUseCase(categoryRepository, s3Storage, logger);
       },
-      inject: [CategoryRepository],
+      inject: [CategoryRepository, S3Storage, PinoLogger],
     },
     {
       provide: IGetCategoryUseCase,
-      useFactory: (
-        categoryRepository: CategoryRepository,
-      ) => {
-        return new GetCategoryUseCase(
-          categoryRepository,
-        );
+      useFactory: (categoryRepository: CategoryRepository) => {
+        return new GetCategoryUseCase(categoryRepository);
       },
       inject: [CategoryRepository],
     },
     {
       provide: IDeleteCategoryUseCase,
-      useFactory: (
-        categoryRepository: CategoryRepository,
-      ) => {
-        return new DeleteCategoryUseCase(
-          categoryRepository,
-        );
+      useFactory: (categoryRepository: CategoryRepository) => {
+        return new DeleteCategoryUseCase(categoryRepository);
       },
       inject: [CategoryRepository],
     },
@@ -68,6 +63,6 @@ import { DeleteCategoryUseCase } from './usecases/delete-category/delete-categor
     },
   ],
   controllers: [CategoryController],
-  exports: [CategoryRepository]
+  exports: [CategoryRepository],
 })
 export class CategoryModule {}

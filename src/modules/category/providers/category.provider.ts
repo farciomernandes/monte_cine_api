@@ -6,6 +6,7 @@ import { IGetCategoryUseCase } from '../usecases/get-categories/interfaces/get-c
 import { PaginationDto } from 'src/shared/filter/pagination.dto';
 import { IDeleteCategoryUseCase } from '../usecases/delete-category/interfaces/delete-category.interface';
 import { SearchParamsDto } from 'src/shared/filter/search-params.dto';
+import { Multer } from 'multer';
 
 @Injectable()
 export class CategoryProvider {
@@ -13,14 +14,19 @@ export class CategoryProvider {
     private readonly saveCategoryUseCase: ISaveCategoryUseCase,
     private readonly getCategoryUseCase: IGetCategoryUseCase,
     private readonly deleteCategoryUseCase: IDeleteCategoryUseCase,
-
   ) {}
 
-  async saveOrUpdateCategory(payload: SaveCategoryDto, id?: string): Promise<CategoryModelDto> {
-    return this.saveCategoryUseCase.execute(payload, id);
+  async saveOrUpdateCategory(
+    payload: Omit<SaveCategoryDto, 'banner'>,
+    banner: Multer.File,
+    id?: string,
+  ): Promise<CategoryModelDto> {
+    return this.saveCategoryUseCase.execute(payload, banner, id);
   }
 
-  async findAll(params: SearchParamsDto): Promise<PaginationDto<CategoryModelDto>> {
+  async findAll(
+    params: SearchParamsDto,
+  ): Promise<PaginationDto<CategoryModelDto>> {
     return this.getCategoryUseCase.execute(params);
   }
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class SaveCategoryDto {
   @ApiProperty({
@@ -10,10 +10,14 @@ export class SaveCategoryDto {
   @IsNotEmpty({ message: 'The field name is required' })
   name: string;
 
+  image_link: string;
+
   @ApiProperty({
-    description: 'The image link of the category',
-    example: 'https://example.com/image.jpg',
+    type: 'string',
+    format: 'binary',
+    description: 'Image file',
   })
   @IsString()
-  image_link: string;
+  @IsOptional()
+  banner: string;
 }

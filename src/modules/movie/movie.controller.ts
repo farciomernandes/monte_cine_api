@@ -88,7 +88,7 @@ export class MovieController {
   async updateMovie(
     @Param('id') id: string,
     @Body() payload: Omit<SaveMovieDto, 'banner'>,
-    @UploadedFile() banner: any,
+    @UploadedFile() banner: Multer.File,
   ): Promise<MovieModelDto> {
     if (payload.categories && typeof payload.categories === 'string') {
       try {

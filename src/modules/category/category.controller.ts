@@ -10,10 +10,11 @@ import {
   Delete,
   Put,
   Param,
+  UploadedFile,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -24,16 +25,19 @@ import { CategoryModelDto } from './dtos/category-model.dto';
 import { PaginationDto } from 'src/shared/filter/pagination.dto';
 import { CategoryProvider } from './providers/category.provider';
 import { SearchParamsDto } from 'src/shared/filter/search-params.dto';
+import { Multer } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+import multerConfig from '@infra/config/multerConfig';
 
 @ApiTags('Category')
 @Controller('categories')
 @UseInterceptors(CacheInterceptor)
 export class CategoryController {
-  constructor(
-    private readonly categoryProvider: CategoryProvider,
-  ) {}
+  constructor(private readonly categoryProvider: CategoryProvider) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('banner', multerConfig))
   @ApiOperation({
     summary: 'Criar uma Categoria',
   })
@@ -47,15 +51,18 @@ export class CategoryController {
   })
   @HttpCode(HttpStatus.OK)
   async saveCategory(
-    @Body() payload: SaveCategoryDto,
+    @Body() payload: Omit<SaveCategoryDto, 'banner'>,
+    @UploadedFile() banner: Multer.File,
   ): Promise<CategoryModelDto> {
-    return this.categoryProvider.saveOrUpdateCategory(payload);
+    return this.categoryProvider.saveOrUpdateCategory(payload, banner);
   }
 
   @Put(':id')
   @ApiOperation({
     summary: 'Atualizar uma Categoria',
   })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('banner', multerConfig))
   @ApiBody({
     type: SaveCategoryDto,
     description: 'Payload para atualizar uma Categoria',
@@ -68,8 +75,9 @@ export class CategoryController {
   async updateCategory(
     @Param('id') id: string,
     @Body() payload: SaveCategoryDto,
+    @UploadedFile() banner: Multer.File,
   ): Promise<CategoryModelDto> {
-    return this.categoryProvider.saveOrUpdateCategory(payload, id);
+    return this.categoryProvider.saveOrUpdateCategory(payload, banner, id);
   }
 
   @Get()
@@ -96,9 +104,7 @@ export class CategoryController {
     type: CategoryModelDto,
   })
   @HttpCode(HttpStatus.OK)
-  async deleteCategory(
-    @Param('id') id: string,
-  ): Promise<CategoryModelDto> {
+  async deleteCategory(@Param('id') id: string): Promise<CategoryModelDto> {
     return this.categoryProvider.delete(id);
   }
 }
