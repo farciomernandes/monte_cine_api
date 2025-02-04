@@ -11,12 +11,10 @@ export class DeleteMovieUseCase implements IDeleteMovieUseCase {
     const alreadyExists = await this.movieRepository.findOneBy({ id });
 
     if (!alreadyExists) {
-      throw new NotFoundException(
-        `Movie with ${id} id not found!`,
-      );
+      throw new NotFoundException(`Movie with ${id} id not found!`);
     }
 
-    await this.movieRepository.delete(alreadyExists);
+    await this.movieRepository.remove(alreadyExists);
 
     return alreadyExists;
   }

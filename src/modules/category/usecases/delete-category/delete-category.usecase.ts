@@ -11,12 +11,10 @@ export class DeleteCategoryUseCase implements IDeleteCategoryUseCase {
     const alreadyExists = await this.categoryRepository.findOneBy({ id });
 
     if (!alreadyExists) {
-      throw new NotFoundException(
-        `Category with ${id} id not found!`,
-      );
+      throw new NotFoundException(`Category with ${id} id not found!`);
     }
 
-    await this.categoryRepository.delete(alreadyExists);
+    await this.categoryRepository.remove(alreadyExists);
 
     return alreadyExists;
   }
