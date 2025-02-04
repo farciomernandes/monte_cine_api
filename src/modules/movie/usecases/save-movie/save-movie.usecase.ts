@@ -79,7 +79,11 @@ export class SaveMovieUseCase implements ISaveMovieUseCase {
       payload.categories = categories;
     }
 
-    const image_url = await this.s3Repository.saveFile(banner);
+    let image_url = movie.banner;
+
+    if (banner) {
+      image_url = await this.s3Repository.saveFile(banner);
+    }
 
     const movieData = {
       ...movie,

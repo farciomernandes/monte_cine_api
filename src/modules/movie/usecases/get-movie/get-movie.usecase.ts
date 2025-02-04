@@ -5,6 +5,7 @@ import { IGetMovieUseCase } from './interfaces/get-movie.interface';
 import { PaginationDto } from 'src/shared/filter/pagination.dto';
 import { SearchParamsDto } from 'src/shared/filter/search-params.dto';
 import { MovieRepository } from '@infra/typeorm/repositories/movie.respository';
+import { Like } from 'typeorm';
 
 @Injectable()
 export class GetMovieUseCase implements IGetMovieUseCase {
@@ -15,6 +16,7 @@ export class GetMovieUseCase implements IGetMovieUseCase {
     limit = 30,
     slug,
     category_id,
+    search,
   }: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
     if (page < 1 || limit < 1) {
       throw new BadRequestException(
@@ -30,6 +32,10 @@ export class GetMovieUseCase implements IGetMovieUseCase {
 
     if (category_id) {
       where.categories = { id: category_id };
+    }
+
+    if (search) {
+      where.title = Like(`%${search}%`);
     }
 
     const [movies, total] = await this.movieRepository.findAndCount({
@@ -48,6 +54,7 @@ export class GetMovieUseCase implements IGetMovieUseCase {
       movieDto.year = Number(movie.year);
       movieDto.duration = Number(movie.duration);
       movieDto.link = movie.link;
+      movieDto.banner = movie.banner;
       movieDto.director = movie.director;
       movieDto.country = movie.country;
       movieDto.audio = movie.audio;

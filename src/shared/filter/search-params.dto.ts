@@ -43,13 +43,13 @@ export class SearchParamsDto {
   @IsOptional()
   category_id: string;
 
-  // @ApiProperty({
-  //   description: 'Texto para pesquisa nos campos relacionados',
-  //   example: 'ação',
-  //   required: false,
-  // })
-  // @IsOptional()
-  // search: string;
+  @ApiProperty({
+    description: 'Texto para pesquisa nos campos title e name',
+    example: 'ação',
+    required: false,
+  })
+  @IsOptional()
+  search: string;
   //
   // @ApiProperty({
   //   description: 'Campo para ordenação, por padrão ordena por "id"',
