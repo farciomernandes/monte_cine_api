@@ -25,6 +25,22 @@ export class SearchParamsDto {
   @Transform(({ value }) => (value ? Number(value) : 10))
   limit: number = 10;
 
+  @ApiProperty({
+    description: 'Slug para pesquisa nos campos relacionados',
+    example: 'matriz_2',
+    required: false,
+  })
+  @IsOptional()
+  slug: string;
+
+  @ApiProperty({
+    description: 'Id da categoria para pesquisa nos campos relacionados',
+    example: 'matriz_2',
+    required: false,
+  })
+  @IsOptional()
+  category_id: string;
+
   // @ApiProperty({
   //   description: 'Texto para pesquisa nos campos relacionados',
   //   example: 'ação',
@@ -32,7 +48,7 @@ export class SearchParamsDto {
   // })
   // @IsOptional()
   // search: string;
-// 
+  //
   // @ApiProperty({
   //   description: 'Campo para ordenação, por padrão ordena por "id"',
   //   example: 'name',
@@ -40,7 +56,7 @@ export class SearchParamsDto {
   // })
   // @IsOptional()
   // sort: string = 'id';
-// 
+  //
   // @ApiProperty({
   //   description: 'Ordem da ordenação: asc ou desc',
   //   example: 'asc',

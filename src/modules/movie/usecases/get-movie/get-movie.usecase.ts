@@ -13,6 +13,8 @@ export class GetMovieUseCase implements IGetMovieUseCase {
   async execute({
     page,
     limit,
+    slug,
+    category_id,
   }: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
     if (page < 1 || limit < 1) {
       throw new BadRequestException(
@@ -20,7 +22,18 @@ export class GetMovieUseCase implements IGetMovieUseCase {
       );
     }
 
+    const where: any = {};
+
+    if (slug) {
+      where.slug = slug;
+    }
+
+    if (category_id) {
+      where.categories = { id: category_id };
+    }
+
     const [movies, total] = await this.movieRepository.findAndCount({
+      where, // Aplica os filtros
       take: limit,
       skip: (page - 1) * limit,
       relations: ['categories'],
@@ -44,9 +57,6 @@ export class GetMovieUseCase implements IGetMovieUseCase {
       movieDto.rating = Number(movie.rating);
       movieDto.synopsis = movie.synopsis;
       movieDto.cast = movie.cast;
-      movieDto.cast = movie.cast;
-      movieDto.cast = movie.cast;
-
       movieDto.available_languages = movie.available_languages;
       movieDto.available_streaming = movie.available_streaming;
       movieDto.created_at = movie.created_at;

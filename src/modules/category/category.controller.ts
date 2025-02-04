@@ -90,7 +90,7 @@ export class CategoryController {
   })
   @HttpCode(HttpStatus.OK)
   async getCategories(
-    @Query() queryParams: SearchParamsDto,
+    @Query() queryParams: Omit<Omit<SearchParamsDto, 'slug'>, 'category_id'>,
   ): Promise<PaginationDto<CategoryModelDto>> {
     return this.categoryProvider.findAll(queryParams);
   }

@@ -10,6 +10,7 @@ import { In } from 'typeorm';
 import { S3Storage } from '@infra/aws/S3Storage';
 import { Multer } from 'multer';
 import { PinoLogger } from '@infra/logger/pino.logger';
+import { createSlug } from 'src/shared/utils/utils';
 
 @Injectable()
 export class SaveMovieUseCase implements ISaveMovieUseCase {
@@ -80,7 +81,12 @@ export class SaveMovieUseCase implements ISaveMovieUseCase {
 
     const image_url = await this.s3Repository.saveFile(banner);
 
-    const movieData = { ...movie, ...payload, banner: image_url };
+    const movieData = {
+      ...movie,
+      ...payload,
+      banner: image_url,
+      slug: payload.slug ?? createSlug(payload.title),
+    };
     this.logger.log(`Saving movie ${payload.title}`);
 
     return this.movieRepository.save(movieData);

@@ -73,6 +73,7 @@ export abstract class Setups {
 
   static middlewares(): typeof Setups {
     this.app.useGlobalPipes(new ValidationPipe());
+    this.app.enableCors();
     return this;
   }
 
