@@ -7,6 +7,7 @@ export class SearchParamsDto {
     description: 'Número da página atual para a consulta',
     example: 1,
     required: false,
+    default: 1,
   })
   @IsOptional()
   @IsInt()
@@ -18,6 +19,7 @@ export class SearchParamsDto {
     description: 'Número de itens por página',
     example: 10,
     required: false,
+    default: 10,
   })
   @IsOptional()
   @IsInt()

@@ -25,7 +25,7 @@ export class CategoryProvider {
   }
 
   async findAll(
-    params: Omit<Omit<SearchParamsDto, 'slug'>, 'category_id'>,
+    params: SearchParamsDto,
   ): Promise<PaginationDto<CategoryModelDto>> {
     return this.getCategoryUseCase.execute(params);
   }

@@ -4,6 +4,6 @@ import { CategoryModelDto } from '@modules/category/dtos/category-model.dto';
 
 export abstract class IGetCategoryUseCase {
   abstract execute(
-    params: Omit<Omit<SearchParamsDto, 'slug'>, 'category_id'>,
+    params: SearchParamsDto,
   ): Promise<PaginationDto<CategoryModelDto>>;
 }

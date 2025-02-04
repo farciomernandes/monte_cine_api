@@ -11,8 +11,8 @@ export class GetMovieUseCase implements IGetMovieUseCase {
   constructor(private readonly movieRepository: MovieRepository) {}
 
   async execute({
-    page,
-    limit,
+    page = 1,
+    limit = 30,
     slug,
     category_id,
   }: SearchParamsDto): Promise<PaginationDto<MovieModelDto>> {
@@ -33,7 +33,7 @@ export class GetMovieUseCase implements IGetMovieUseCase {
     }
 
     const [movies, total] = await this.movieRepository.findAndCount({
-      where, // Aplica os filtros
+      where,
       take: limit,
       skip: (page - 1) * limit,
       relations: ['categories'],

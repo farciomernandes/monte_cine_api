@@ -10,9 +10,14 @@ import { CategoryRepository } from '@infra/typeorm/repositories/category.resposi
 export class GetCategoryUseCase implements IGetCategoryUseCase {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async execute({ page, limit }: SearchParamsDto): Promise<PaginationDto<CategoryModelDto>> {
-    if (page < 1 || limit < 1) {
-      throw new BadRequestException('Page and limit must be greater than zero.');
+  async execute({
+    page = 1,
+    limit = 20,
+  }: SearchParamsDto): Promise<PaginationDto<CategoryModelDto>> {
+    if (page < 1 || limit < 1 || !page || !limit) {
+      throw new BadRequestException(
+        'Page and limit must be greater than zero.',
+      );
     }
 
     const [categories, total] = await this.categoryRepository.findAndCount({
@@ -22,7 +27,7 @@ export class GetCategoryUseCase implements IGetCategoryUseCase {
 
     const totalPages = Math.ceil(total / limit);
 
-    const data = categories.map(category => {
+    const data = categories.map((category) => {
       const categoryDto = new CategoryModelDto();
       categoryDto.id = category.id;
       categoryDto.name = category.name;
@@ -32,6 +37,12 @@ export class GetCategoryUseCase implements IGetCategoryUseCase {
       return categoryDto;
     });
 
-    return { data, total, totalPages, currentPage: Number(page), limit: Number(limit) };
+    return {
+      data,
+      total,
+      totalPages,
+      currentPage: Number(page),
+      limit: Number(limit),
+    };
   }
 }
