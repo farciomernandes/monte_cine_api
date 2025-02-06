@@ -19,8 +19,8 @@ import { MovieModule } from '@modules/movie/movie.module';
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 600000, //miliseconds
-        limit: 100, // requests
+        ttl: 60000000000000, //miliseconds
+        limit: 10000000, // requests
       },
     ]),
     ConfigModule.forRoot({ isGlobal: true }),
